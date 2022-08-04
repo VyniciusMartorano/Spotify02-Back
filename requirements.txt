@@ -1,0 +1,4 @@
+Django==4.1
+django-rest-framework==0.1.0
+pytube==12.1.0
+mysqlclient==2.1.1
