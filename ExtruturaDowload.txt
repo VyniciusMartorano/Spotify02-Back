@@ -1,0 +1,18 @@
+
+
+Inserir musica na BD -> deve estar logado e ter permissão de adm
+
+Campo de Url = str
+nome da musica = str
+nome do artista = str
+imagem da musica = img
+duração = analisar o tamanho da musica após o dowload e Inserir
+genero = choice
+
+
+
+
+Table
+artists
+-name
+-musics
