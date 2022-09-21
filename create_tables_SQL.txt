@@ -1,0 +1,38 @@
+-- Spotify02.Artist definition
+
+CREATE TABLE `Artist` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `qtd_tracks` int NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
+-- Spotify02.Genero definition
+
+CREATE TABLE `Genero` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `descricao` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
+-- Spotify02.Musics definition
+
+CREATE TABLE `Musics` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `music_name` varchar(255) NOT NULL,
+  `artist_id` int NOT NULL,
+  `genero_id` int DEFAULT NULL,
+  `duration` float NOT NULL,
+  `liked` tinyint(1) NOT NULL,
+  `image` varchar(255) DEFAULT NULL,
+  `file` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `Musics_FK` (`genero_id`),
+  KEY `Musics_FK_1` (`artist_id`),
+  CONSTRAINT `Musics_FK` FOREIGN KEY (`genero_id`) REFERENCES `Genero` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `Musics_FK_1` FOREIGN KEY (`artist_id`) REFERENCES `Artist` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Armazena todas as musicas';
