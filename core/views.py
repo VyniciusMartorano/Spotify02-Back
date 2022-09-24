@@ -15,42 +15,41 @@ from api.settings import MEDIA_ROOT
 class MusicsViewSet(viewsets.ModelViewSet):
     queryset = Musics.objects.all()
     serializer_class = MusicsSerializer
-
-
+ 
+    
     @action(detail=False, methods=['post'])
-    def download_music_by_url(self, *args, **kwargs):
-        #TODO: LER ISSO
-        """
-        -Usar esta url como serviço...
-        -Quando for salvar a musica como download deverá 
-        pegar o path dela e armarzenar como string
-        :Path da musica -> {MEDIA_ROOT}/musics/{filename}.mp3
-        
-        """
-        req = self.request.data
-        
-        name_music = req['name_music'] if 'name_music' in req else None
-        urlMusic = req['url'] if 'url' in req else None
+    def insert_music(self, *args, **kwargs):
+        fields = [ 'name_music','artist_id','genero_id','music' ]
+        name_music, artist_id, genero_id, music = [ self.request.data.get(i, None) for i in fields ]
 
+        if not music: return Response(data='Você precisa enviar a música', status=500)
         
-        if not urlMusic: Response('A url da música não foi passado para a função') 
-        
-        try: 
-            dowloadMusic(
-                urlMusic=urlMusic, 
-                output_path=f'{MEDIA_ROOT}/musics/' ,
-                filename='2018-em-umaMusica',
+        if type(music) == str: 
+            try: 
+                music = dowloadMusic(
+                    urlMusic=music, 
+                    output_path=f'{MEDIA_ROOT}/musics/',
+                    filename=name_music,
                 )
-        except FileExistsError as erro: 
-            return Response(data='A música que você está tentando inserir já existe em nosso banco de dados', status=status.HTTP_400_BAD_REQUEST)
-        else: return Response(data='Download realizado com sucesso!', status=status.HTTP_200_OK)
+                
+            except FileExistsError: return Response(f'A música {name_music} já existe no banco de dados', status=500)
+                
+        
+        music = Musics(
+            music_name=name_music,
+            artist_id=artist_id,
+            genero_id=genero_id,
+            file=music,
+            image='aa'
+        )
+
+        music.save()
+
+        return Response(MusicsSerializer(music).data)
         
 
-      
-            
+
         
-    
-    
     @action(methods=['delete'], detail=False)
     def delete(self, *args, **kwargs):
         request = self.request.data
@@ -63,7 +62,6 @@ class MusicsViewSet(viewsets.ModelViewSet):
 
         music = qs_musics.get(id=music_id)
         
-        # artist_id = music.__dict__['artist_id'] 
         artist_id = music.artist.id 
         artist = qs_artists.filter(id=artist_id).first()
         #TODO: testar com get

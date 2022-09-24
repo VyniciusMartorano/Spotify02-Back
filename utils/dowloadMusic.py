@@ -4,9 +4,7 @@ import os
 
 def dowloadMusic(urlMusic: str, output_path: str, filename: str) -> str:
     parcial_file_full_path = f'{output_path}/{filename}.mp3'
-    if os.path.isfile(parcial_file_full_path):
-        raise FileExistsError
-    print('jfghdiughdui')
+    if os.path.isfile(parcial_file_full_path): raise FileExistsError
     yt = YouTube(url=urlMusic)
     video = yt.streams.filter(only_audio=True).first()
     out_file = video.download(output_path=output_path,filename=filename)

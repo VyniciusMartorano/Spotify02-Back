@@ -5,7 +5,7 @@ from .models import Musics, Artist, Genero
 
 class MusicsSerializer(serializers.ModelSerializer):
     # image = serializers.ImageField(use_url=True)
-    # file = serializers.FileField(use_url=True)
+    file = serializers.FileField(use_url=True)
 
     class Meta:
         model = Musics
@@ -18,8 +18,7 @@ class MusicsSerializer(serializers.ModelSerializer):
 
         artist = validated_data['artist'].__dict__ if 'artist' in validated_data else None
 
-        if not artist:
-            return Response('Não foi possivel criar a música desejada', 500)
+        if not artist: return Response('Não foi possivel criar a música desejada', 500)
 
         qs_artists.filter(id=artist['id']).update(qtd_tracks=artist['qtd_tracks'] + 1)
         return Musics.objects.create(**validated_data)
