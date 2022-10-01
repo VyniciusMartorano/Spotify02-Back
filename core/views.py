@@ -9,6 +9,10 @@ from rest_framework import status
 sys.path.append('utils')
 from utils.dowloadMusic import dowloadMusic
 from api.settings import MEDIA_ROOT
+from utils.media.media_urls import DEFAULT_IMAGE_PATH
+import os
+
+
 
 
 
@@ -19,32 +23,37 @@ class MusicsViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['post'])
     def insert_music(self, *args, **kwargs):
-        fields = [ 'name_music','artist_id','genero_id','music' ]
-        name_music, artist_id, genero_id, music = [ self.request.data.get(i, None) for i in fields ]
+        fields = [ 'name_music','artist_id','genero_id','image','music_url', 'music_file']
+        name_music, artist_id, genero_id, image, music_url, music_file = [ self.request.data.get(item, None) for item in fields ]
 
-        if not music: return Response(data='Você precisa enviar a música', status=500)
-        
+        if not music_url and not music_file: return Response(data='Você precisa enviar a música', status=500)
+
+        if music_url and music_file: return Response(data='Você deve enviar apenas um dos dois formatos', status=400)
+
+        if not image: image = DEFAULT_IMAGE_PATH
+        print('\n',image)
+
+        music = music_file or music_url
+
         if type(music) == str: 
             try: 
-                music = dowloadMusic(
+                dowloadMusic(
                     urlMusic=music, 
                     output_path=f'{MEDIA_ROOT}/musics/',
                     filename=name_music,
                 )
-                
-            except FileExistsError: return Response(f'A música {name_music} já existe no banco de dados', status=500)
-                
-        
+                music = f'musics/{name_music}.mp3'
+            except FileExistsError: return Response(f'A música {name_music} já existe no banco de dados', status=400)
+            except Exception as e: return Response(f'Não foi possivel salvar a música')
+
         music = Musics(
             music_name=name_music,
             artist_id=artist_id,
             genero_id=genero_id,
             file=music,
-            image='aa'
+            image=image
         )
-
-        music.save()
-
+        music.save(force_insert=True)
         return Response(MusicsSerializer(music).data)
         
 
@@ -57,18 +66,19 @@ class MusicsViewSet(viewsets.ModelViewSet):
         qs_musics = Musics.objects.all()
 
         music_id = request['music_id'] if 'music_id' in request else None
-
         if not music_id: return Response(f'Não foi possivel deletar a música desejada',status=500)
 
         music = qs_musics.get(id=music_id)
-        
         artist_id = music.artist.id 
         artist = qs_artists.filter(id=artist_id).first()
         #TODO: testar com get
         
         qs_artists.filter(id=artist_id).update(qtd_tracks=artist.__dict__['qtd_tracks'] - 1)
-        music.delete()
-        return Response(f'A música {music.__dict__["music_name"]} foi deletada com sucesso', status=200)
+        try: music.delete()
+        except: return Response(data=f'Não foi possivel deletar a música {music.__dict__["music_name"]}')
+        else: 
+            os.remove(f'{MEDIA_ROOT}/{music.__dict__["file"]}')
+            return Response(f'A música {music.__dict__["music_name"]} foi deletada com sucesso', status=200)
 
         
     @action(methods=['post'], detail=False)
@@ -77,7 +87,6 @@ class MusicsViewSet(viewsets.ModelViewSet):
         queryset = Musics.objects.all()
 
         data_filter = request['data_filter'] if 'data_filter' in request else None
-
 
         if data_filter:
             queryset = queryset.filter(music_name__icontains=data_filter) |\
