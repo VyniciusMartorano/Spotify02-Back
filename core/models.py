@@ -3,25 +3,30 @@ from PIL import Image
 from pickletools import optimize
 import os
 from django.conf import settings
+from django.contrib.auth.models import User
 
 
 def upload_image_music(instance, filename):
     return f'images/{instance}-{filename}'
+
+def upload_thumbnail(instance, filename):
+    return f'images/thumbnails/{instance}-{filename}'
 
 def upload_file_music(instance, filename):
     return f'musics/{instance}-{filename}'
 
 
 class Artist(models.Model):
-    name = models.CharField(max_length=255, null=False, blank=False)
+    name       = models.CharField(max_length=255, null=False, blank=False)
     qtd_tracks = models.IntegerField(blank=True, null=False, default=0)
 
     class Meta:
         managed = False
-        db_table = 'Artist'
+        db_table = 'Artists'
     
     def __str__(self):
         return self.name
+
 
 
 class Genero(models.Model):
@@ -29,28 +34,24 @@ class Genero(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'Genero'
+        db_table = 'Generos'
     
     def __str__(self):
         return self.descricao
 
 
+
 class Musics(models.Model):
-    music_name = models.CharField(max_length=255, null=False, blank=False)
-    artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
-    genero = models.ForeignKey(Genero, on_delete=models.CASCADE)
-    # image = models.CharField(max_length=255, null=True, blank=True)
-    image = models.ImageField(upload_to=upload_image_music, blank=True)
-    file = models.FileField(upload_to=upload_file_music, blank=True)
-    duration = models.FloatField(null=True, blank=True)
-    liked = models.BooleanField(default=False)
+    music_name = models.CharField(max_length=100, null=False, blank=False)
+    artist     = models.ForeignKey(Artist, on_delete=models.CASCADE)
+    genero     = models.ForeignKey(Genero, on_delete=models.CASCADE)
+    image      = models.ImageField(db_column='imagem',upload_to=upload_image_music, blank=True)
+    file       = models.FileField(db_column='music',upload_to=upload_file_music, blank=True)
+    duration   = models.FloatField(null=True, blank=True)
+    liked      = models.BooleanField(default=False)
 
     def __str__(self): return self.music_name
-
-
-    #TODO: delete pelo Model
-
-    #TODO: remover a linha abaixo
+    
     @staticmethod
     def resize_image(img, new_width=68):
         img_full_path = os.path.join(settings.MEDIA_ROOT, img.name)
@@ -69,15 +70,48 @@ class Musics(models.Model):
             quality=50
         )
     
-    # TODO: Descomentar quando for adicionar imagem
+    
     def save(self,*args,**kwargs):
+        super().save(*args,**kwargs)
         max_image_size = 68
-        if self.image:
-            self.resize_image(self.image, max_image_size)
+        if self.image: self.resize_image(self.image, max_image_size)
+       
 
 
     class Meta:
         managed = False
         db_table = 'Musics'
 
+
+class MusicsLiked(models.Model):
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    music_id = models.ForeignKey(Musics, on_delete=models.CASCADE)
+
+    class Meta:
+        managed = False
+        db_table = 'MusicsLiked'
         
+
+
+class Playlist(models.Model):
+    name = models.CharField(max_length=100, null=False, blank=False)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    thumbnail = models.ImageField(upload_to=upload_thumbnail, blank=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Playlists'
+
+
+
+class PlaylistMusic(models.Model):
+    music_id = models.ForeignKey(Musics, on_delete=models.CASCADE)
+    playlist_id = models.ForeignKey(Playlist, on_delete=models.CASCADE)
+
+
+    class Meta:
+        managed = False
+        db_table = 'PlaylistMusic'
+
+
+

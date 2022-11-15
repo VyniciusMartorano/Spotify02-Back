@@ -1,0 +1,73 @@
+
+
+
+
+CREATE TABLE Artists (
+  id int NOT NULL IDENTITY,
+  name varchar(100) NOT NULL,
+  qtd_tracks int NOT NULL,
+  PRIMARY KEY (id)
+) 
+
+
+
+
+CREATE TABLE Generos (
+	id int NOT NULL IDENTITY,
+	descricao varchar(100) NOT NULL,
+	PRIMARY KEY (id)
+)
+
+
+
+
+CREATE TABLE Musics (
+	id int NOT NULL IDENTITY,
+	music_name varchar(100) NOT NULL,
+	artist_id int NOT NULL,
+	genero_id int NOT NULL,
+	imagem varchar(255),
+	music  varchar(255) NOT NULL,		
+	PRIMARY KEY (id),
+
+	FOREIGN KEY (genero_id) REFERENCES generos(id),
+	FOREIGN KEY (artist_id) REFERENCES Artists(id)
+)
+
+
+
+
+CREATE TABLE MusicsLiked (
+	id INT IDENTITY NOT NULL,
+	user_id  INT NOT NULL,
+	music_id  INT NOT NULL,
+	
+	PRIMARY KEY(id),
+	FOREIGN KEY (user_id) REFERENCES auth_user(id),
+	FOREIGN KEY (music_id) REFERENCES Musics(id)
+)
+
+
+
+CREATE TABLE playlists (
+  id int NOT NULL AUTO_INCREMENT IDENTITY,
+  name varchar(100) NOT NULL,
+  user_id varchar(100) ,
+  thumbnail varchar(255),
+  PRIMARY KEY (id)
+) 
+
+
+
+
+CREATE TABLE PlaylistMusic (
+	id int NOT NULL IDENTITY,
+	music_id int NOT NULL,
+	playlist_id int NOT NULL,
+	PRIMARY KEY (id),
+  
+	FOREIGN KEY (music_id) REFERENCES Musics(id),
+	FOREIGN KEY (playlist_id) REFERENCES Playlists(id)
+
+)
+
