@@ -18,6 +18,16 @@ from . import serializers as s
 
 
 
+"""
+TODO:
+
+QUANDO CRIAR ARTISTA JA CRIAR A PLAYLIST THIS DELE
+E QUANDO FOR ADICIONADA UMA MUSICA JA ADICIONAR ELA NA PLAYLIST THIS
+usar trigger pra isso
+"""
+
+
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = s.UserSerializer
@@ -203,6 +213,22 @@ class PlaylistViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     queryset = m.Playlist.objects.all()
     serializer_class = s.PlaylistSerializer
+
+
+    @action(detial=False, methods=['post'])
+    def retrieve_playlists(self, *args, **kwargs):
+        qs = m.Playlist.objects.using('default')
+        queryset = self.request.data
+
+        user_id = req['user_id'] if 'user_id' in req else None
+        isDefault = req['isDefault'] if 'isDefault' in req else None
+
+
+        if user_id: qs = qs.filter(user_id=user_id)
+        if isDefault: qs = qs.filter(isDefault=isDefault)
+
+        return Response(s.PlaylistSerializer(qs, many=True).data, status=200)
+
 
  
 

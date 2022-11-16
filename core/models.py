@@ -97,6 +97,7 @@ class Playlist(models.Model):
     name = models.CharField(max_length=100, null=False, blank=False)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     thumbnail = models.ImageField(upload_to=upload_thumbnail, blank=True)
+    isDefault = models.IntegerField(null=False, blank=False)
 
     class Meta:
         managed = False

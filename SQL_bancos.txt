@@ -52,6 +52,7 @@ CREATE TABLE MusicsLiked (
 CREATE TABLE playlists (
   id int NOT NULL AUTO_INCREMENT IDENTITY,
   name varchar(100) NOT NULL,
+  isDefault bit NOT NULL,
   user_id varchar(100) ,
   thumbnail varchar(255),
   PRIMARY KEY (id)
