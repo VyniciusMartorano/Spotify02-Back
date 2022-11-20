@@ -1,6 +1,7 @@
 import sys, os
 sys.path.append('utils')
 from django.shortcuts import render
+import json
 from django.db import models
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -24,6 +25,11 @@ TODO:
 QUANDO CRIAR ARTISTA JA CRIAR A PLAYLIST THIS DELE
 E QUANDO FOR ADICIONADA UMA MUSICA JA ADICIONAR ELA NA PLAYLIST THIS
 usar trigger pra isso
+
+
+
+
+TODO: CRIAR API PARA DOWNLOADS
 """
 
 
@@ -89,21 +95,18 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class ArtistViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)
     queryset = m.Artist.objects.all()
     serializer_class = s.ArtistSerializer
     
 
 
 class GeneroViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)
     queryset = m.Genero.objects.all()
     serializer_class = s.GeneroSerializer
 
 
 
 class MusicsViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)
     queryset = m.Musics.objects
     serializer_class = s.MusicsSerializer
  
@@ -135,7 +138,7 @@ class MusicsViewSet(viewsets.ModelViewSet):
             if (qs_musics.filter(music_name=name_music).count() > 0):
                 return Response(data=f'A música {name_music} já existe no banco de dados', status=400)
 
-        music = Musics(
+        music = m.Musics(
             music_name=name_music,
             artist_id=artist_id,
             genero_id=genero_id,
@@ -204,18 +207,17 @@ class MusicsViewSet(viewsets.ModelViewSet):
 
 
 class MusicsLikedViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)
     queryset = m.MusicsLiked.objects.all()
     serializer_class = s.MusicsLikedSerializer
 
 
+
 class PlaylistViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)
     queryset = m.Playlist.objects.all()
     serializer_class = s.PlaylistSerializer
 
 
-    @action(detial=False, methods=['post'])
+    @action(detail=False, methods=['post'])
     def retrieve_playlists(self, *args, **kwargs):
         qs = m.Playlist.objects.using('default')
         queryset = self.request.data
@@ -229,15 +231,52 @@ class PlaylistViewSet(viewsets.ModelViewSet):
 
         return Response(s.PlaylistSerializer(qs, many=True).data, status=200)
 
+    def get_playlists_ids_by_group_id(self, group_id) -> list:
+        qs_playlist_group_itens = m.PlaylistGroupItem.objects.using('default')
+        qs_playlists = m.Playlist.objects.using('default')
 
- 
+        ids_playlists = qs_playlist_group_itens.filter(group_id=group_id).values_list('playlist_id')
+        qs_playlists = qs_playlists.filter(id__in=ids_playlists)
+
+        return s.PlaylistSerializer(qs_playlists, many=True).data
+
+
+    @action(detail=False, methods=['get'])
+    def retrieve_playlists_by_groups(self, *args, **kwargs):
+        qs_groups = m.PlaylistGroup.objects.using('default').all()
+
+        result = []
+
+        for group in qs_groups:
+            group_playlists = {}
+            group_playlists['id'] = group.id
+            group_playlists['title'] = group.descricao
+            group_playlists['playlists'] = self.get_playlists_ids_by_group_id(group.id)
+
+            result.append(group_playlists)
+
+
+
+        serializado = json.dumps({'data': result})
+
+        return Response(result, status=200)
+
+
+
+class PlaylistGroupViewSet(viewsets.ModelViewSet):
+    queryset = m.PlaylistGroup.objects.all()
+    serializer_class = s.PlaylistGroupSerializer
+
+
+
+class PlaylistGroupItemViewSet(viewsets.ModelViewSet):
+    queryset = m.PlaylistGroupItem.objects.all()
+    serializer_class = s.PlaylistGroupItemSerializer
+
 
 
 class PlaylistMusicViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)
     queryset = m.PlaylistMusic.objects.all()
     serializer_class = s.PlaylistMusicSerializer
-
-
 
 

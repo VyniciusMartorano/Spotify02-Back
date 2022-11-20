@@ -48,7 +48,7 @@ class Musics(models.Model):
     image      = models.ImageField(db_column='imagem',upload_to=upload_image_music, blank=True)
     file       = models.FileField(db_column='music',upload_to=upload_file_music, blank=True)
     duration   = models.FloatField(null=True, blank=True)
-    liked      = models.BooleanField(default=False)
+    #TODO: trazer a info do liked no serializer puxando do musicsliked
 
     def __str__(self): return self.music_name
     
@@ -94,25 +94,49 @@ class MusicsLiked(models.Model):
 
 
 class Playlist(models.Model):
-    name = models.CharField(max_length=100, null=False, blank=False)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=20, null=False, blank=False)
+    descricao = models.CharField(max_length=45, null=False, blank=False)
+    user_id = models.ForeignKey(User, db_column='user_id',on_delete=models.CASCADE)
     thumbnail = models.ImageField(upload_to=upload_thumbnail, blank=True)
-    isDefault = models.IntegerField(null=False, blank=False)
+    is_default = models.IntegerField(null=False, blank=False)
 
     class Meta:
         managed = False
         db_table = 'Playlists'
+    
+    def __str__(self): return self.title
 
 
 
 class PlaylistMusic(models.Model):
     music_id = models.ForeignKey(Musics, on_delete=models.CASCADE)
-    playlist_id = models.ForeignKey(Playlist, on_delete=models.CASCADE)
+    playlist_id = models.ForeignKey(Playlist,db_column='playlist_id' ,on_delete=models.CASCADE)
 
 
     class Meta:
         managed = False
         db_table = 'PlaylistMusic'
+
+
+
+class PlaylistGroup(models.Model):
+    descricao = models.CharField(max_length=20, blank=False, null=False)
+    default = models.IntegerField(blank=False, null=False)
+
+    class Meta:
+        managed = False
+        db_table = 'PlaylistGroups'
+    
+    def __str__(self): return self.descricao
+
+
+class PlaylistGroupItem(models.Model):
+    playlist_id = models.ForeignKey(Playlist,db_column='playlist_id' ,on_delete=models.CASCADE)
+    group_id = models.ForeignKey(PlaylistGroup,db_column='group_id' ,on_delete=models.CASCADE)
+
+    class Meta:
+        managed = False
+        db_table = 'PlaylistGroupItens'
 
 
 

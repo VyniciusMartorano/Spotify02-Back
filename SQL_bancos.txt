@@ -28,6 +28,7 @@ CREATE TABLE Musics (
 	genero_id int NOT NULL,
 	imagem varchar(255),
 	music  varchar(255) NOT NULL,		
+	duration float NULL,
 	PRIMARY KEY (id),
 
 	FOREIGN KEY (genero_id) REFERENCES generos(id),
@@ -49,16 +50,19 @@ CREATE TABLE MusicsLiked (
 
 
 
-CREATE TABLE playlists (
-  id int NOT NULL AUTO_INCREMENT IDENTITY,
-  name varchar(100) NOT NULL,
-  isDefault bit NOT NULL,
-  user_id varchar(100) ,
-  thumbnail varchar(255),
-  PRIMARY KEY (id)
-) 
+CREATE TABLE spotify02.dbo.Playlists (
+	id int IDENTITY NOT NULL,
+	title varchar(20) NOT NULL,
+	user_id int NULL,
+	thumbnail varchar(255) NULL,
+	descricao varchar(45)  NOT NULL,
+	is_default int NOT NULL,
+	PRIMARY KEY (id),
 
+	FOREIGN KEY (user_id) REFERENCES auth_user(id)
+);
 
+--playlists ** musics
 
 
 CREATE TABLE PlaylistMusic (
@@ -72,3 +76,27 @@ CREATE TABLE PlaylistMusic (
 
 )
 
+--groups
+
+CREATE TABLE spotify02.dbo.PlaylistGroups (
+	id int IDENTITY(0,1) NOT NULL,
+	descricao varchar(20) COLLATE Latin1_General_CI_AS NOT NULL,
+	[default] bit NOT NULL,
+	CONSTRAINT NewTable_PK PRIMARY KEY (id)
+);
+
+
+--groupsItens
+
+CREATE TABLE spotify02.dbo.PlaylistGroupItens (
+	id int IDENTITY(0,1) NOT NULL,
+	playlist_id int NOT NULL,
+	group_id int NOT NULL,
+	CONSTRAINT PlaylistGroupItens_PK PRIMARY KEY (id)
+);
+
+
+-- spotify02.dbo.PlaylistGroupItens foreign keys
+
+ALTER TABLE spotify02.dbo.PlaylistGroupItens ADD CONSTRAINT FK_group FOREIGN KEY (group_id) REFERENCES spotify02.dbo.PlaylistGroups(id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE spotify02.dbo.PlaylistGroupItens ADD CONSTRAINT PlaylistGroupItens_FK FOREIGN KEY (playlist_id) REFERENCES spotify02.dbo.Playlists(id) ON DELETE CASCADE ON UPDATE CASCADE;

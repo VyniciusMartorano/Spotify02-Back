@@ -66,6 +66,8 @@ class GeneroSerializer(serializers.ModelSerializer):
 
 
 class PlaylistSerializer(serializers.ModelSerializer):
+    thumbnail = serializers.ImageField(use_url=True)
+    
     class Meta:
         model = m.Playlist
         fields = ('__all__')
@@ -75,4 +77,18 @@ class PlaylistSerializer(serializers.ModelSerializer):
 class PlaylistMusicSerializer(serializers.ModelSerializer):
     class Meta:
         model = m.PlaylistMusic
+        fields = ('__all__')
+
+
+
+class PlaylistGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = m.PlaylistGroup
+        fields = ('__all__')
+
+
+
+class PlaylistGroupItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = m.PlaylistGroupItem
         fields = ('__all__')
