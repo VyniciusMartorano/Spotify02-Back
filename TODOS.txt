@@ -1,0 +1,9 @@
+-criar tabela de qtd ouvidas como historico
+
+-implementar trigger pra criar o this do artista quando o artista for criado
+
+-implementar o redux no front
+
+-implementar autenticação
+
+-adicionar botao de play na playlist

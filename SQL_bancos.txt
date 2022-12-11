@@ -1,14 +1,11 @@
 
 
 
-
-CREATE TABLE Artists (
-  id int NOT NULL IDENTITY,
-  name varchar(100) NOT NULL,
-  qtd_tracks int NOT NULL,
-  PRIMARY KEY (id)
-) 
-
+CREATE TABLE spotify02.dbo.Artists (
+	id int IDENTITY(1,1) NOT NULL,
+	name varchar(100) COLLATE Latin1_General_CI_AS NOT NULL,
+	CONSTRAINT PK__Artists__3213E83F4DC9839B PRIMARY KEY (id)
+)
 
 
 

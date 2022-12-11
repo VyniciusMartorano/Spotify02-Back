@@ -1,23 +1,24 @@
 from pathlib import Path
 from datetime import timedelta
 from django.utils.encoding import *
+from decouple import config, Csv
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-6&!@l&bj=quv97h9y08^p(n3rd!7!4!199fd8egvh%*f0gud2w'
+
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1', cast=Csv())
 
 
 
@@ -29,9 +30,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core.apps.CoreConfig',
-    'rest_framework.authtoken',
-    'rest_framework',
     "corsheaders",
+    'rest_framework',
+    'rest_framework.authtoken'
 ]
 
 
@@ -39,12 +40,12 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "corsheaders.middleware.CorsMiddleware",
+    'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
 
 ROOT_URLCONF = 'api.urls'
@@ -73,14 +74,59 @@ TEMPLATES = [
 WSGI_APPLICATION = 'api.wsgi.application'
 
 
+SIMPLE_JWT = {
+    # 'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=12),
+    'REFRESH_TOKEN_LIFETIME': timedelta(hours=12),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': False,
+
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY':  config('SECRET_KEY'),
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+    'JTI_CLAIM': 'jti',
+
+    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+        
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+if DEBUG:
+    import logging
+    l = logging.getLogger('django.db.backends')
+    l.setLevel(logging.DEBUG)
+    l.addHandler(logging.StreamHandler())
+
+
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
      'default': {
         'ENGINE': 'mssql',
-        'NAME': 'spotify02',
-        'HOST': 'VYNICIUS-MARTOR',
+        'NAME': config('NAME'),
+        'HOST': config('HOST'),
         'OPTIONS': {
             'driver':'ODBC Driver 17 for SQL Server'
         }
@@ -105,17 +151,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-#descomentar pra adicionar autenticação
-# REST_FRAMEWORK = {
-#         'DEFAULT_PERMISSION_CLASSES': [
-#             'rest_framework.permissions.IsAuthenticated',
-#         ],
-#         'DEFAULT_AUTHENTICATION_CLASSES': (
-#             'rest_framework.authentication.BasicAuthentication', 
-#             'rest_framework.authentication.SessionAuthentication',
-#             'rest_framework.authentication.TokenAuthentication',
-#         )
-#     }
+
+
+
+
 
 
 MEDIA_URL = '/media/'
@@ -134,8 +173,5 @@ USE_I18N = True
 USE_TZ = True
 
 
-
-
 STATIC_URL = 'static/'
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

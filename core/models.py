@@ -18,7 +18,6 @@ def upload_file_music(instance, filename):
 
 class Artist(models.Model):
     name       = models.CharField(max_length=255, null=False, blank=False)
-    qtd_tracks = models.IntegerField(blank=True, null=False, default=0)
 
     class Meta:
         managed = False
@@ -67,7 +66,7 @@ class Musics(models.Model):
         new_img.save(
             img_full_path,
             optimize=True,
-            quality=50
+            quality=80
         )
     
     
@@ -105,6 +104,29 @@ class Playlist(models.Model):
         db_table = 'Playlists'
     
     def __str__(self): return self.title
+
+
+    @staticmethod
+    def resize_image(img, new_width=195, new_heigth=195):
+        img_full_path = os.path.join(settings.MEDIA_ROOT, img.name)
+        img_pil = Image.open(img_full_path)
+        original_width, original_height = img_pil.size
+
+        if original_width <= new_width:
+            img_pil.close()
+            return
+        
+        new_img = img_pil.resize((new_width, new_heigth), Image.LANCZOS)
+        new_img.save(
+            img_full_path,
+            optimize=True,
+            quality=90
+        )
+    
+    
+    def save(self,*args,**kwargs):
+        super().save(*args,**kwargs)
+        if self.thumbnail: self.resize_image(self.thumbnail)
 
 
 

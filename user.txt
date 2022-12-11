@@ -1,2 +1,7 @@
 user = user
 pass = Felipebia123
+
+
+superuser ---
+root
+123

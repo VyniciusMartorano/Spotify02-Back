@@ -9,13 +9,11 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'email')
+        fields = ('id','username', 'password')
+
 
     def create(self, validated_data):
-        user = User.objects.create(
-            username=validated_data['username'],
-            email=validated_data['email'],
-        )
+        user = User.objects.create(username=validated_data['username'])
 
         user.set_password(validated_data['password'])
         user.save()
@@ -34,12 +32,11 @@ class MusicsSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
-        qs_artists = m.Artist.objects.all()
         qs_musics = m.Musics.objects.all()
         artist = validated_data['artist'].__dict__ if 'artist' in validated_data else None
 
         if not artist: return Response('Não foi possivel criar a música desejada', 500)
-        qs_artists.filter(id=artist['id']).update(qtd_tracks=artist['qtd_tracks'] + 1)
+        
         return m.Musics.objects.create(**validated_data)
 
 
@@ -52,9 +49,15 @@ class MusicsLikedSerializer(serializers.ModelSerializer):
 
 
 class ArtistSerializer(serializers.ModelSerializer):
+    qtd_tracks = serializers.SerializerMethodField()
+
     class Meta:
         model = m.Artist
         fields = ('__all__')
+    
+    def get_qtd_tracks(self, artist):
+        qs_musics = m.Musics.objects.using('default').filter(artist=artist.id)
+        return len(qs_musics)
 
 
 

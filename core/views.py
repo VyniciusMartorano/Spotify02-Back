@@ -6,7 +6,6 @@ from django.db import models
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from rest_framework import status
@@ -198,8 +197,7 @@ class MusicsViewSet(viewsets.ModelViewSet):
         artist_name = request['artist_name'] if 'artist_name' in request else None
         music_name = request['music_name'] if 'music_name' in request else None
 
-        if artist_name: queryset = queryset.filter(artist__name__icontains=artist_name)
-        
+        if artist_name: queryset = queryset.filter(artist__name__icontains=artist_name) 
         if music_name: queryset = queryset.filter(music_name__icontains=music_name)
 
         return Response(s.MusicsSerializer(queryset, many=True).data, status=200)
@@ -231,7 +229,8 @@ class PlaylistViewSet(viewsets.ModelViewSet):
 
         return Response(s.PlaylistSerializer(qs, many=True).data, status=200)
 
-    def get_playlists_ids_by_group_id(self, group_id) -> list:
+
+    def get_playlists_by_group_id(self, group_id) -> list:
         qs_playlist_group_itens = m.PlaylistGroupItem.objects.using('default')
         qs_playlists = m.Playlist.objects.using('default')
 
@@ -251,15 +250,36 @@ class PlaylistViewSet(viewsets.ModelViewSet):
             group_playlists = {}
             group_playlists['id'] = group.id
             group_playlists['title'] = group.descricao
-            group_playlists['playlists'] = self.get_playlists_ids_by_group_id(group.id)
+            group_playlists['playlists'] = self.get_playlists_by_group_id(group.id)
 
             result.append(group_playlists)
 
-
-
-        serializado = json.dumps({'data': result})
-
         return Response(result, status=200)
+
+    def split_array_in_sub_arrays_with_five_elements(array: list) -> list:
+        result = cache = []
+        tam_array = len(array)
+
+        i = 1
+        while i < tam_array + 1:
+            if i % 5 == 0 or i == tam_array:
+                cache.append(array[i - 1])
+                result.append(cache)
+                cache = []
+            else: cache.append(array[i - 1])
+
+            i += 1
+        return result
+
+
+    @action(detail=False, methods=['post'])
+    def retieve_playlist_from_library_by_user(self, *args, **kwargs):
+        qs_playlists = m.Playlist.objects.using('default')
+        req = self.request.data
+
+        user_id = req['user_id'] if 'user_id' in req else None
+        if user_id: qs_playlists = qs_playlists.filter(user_id=user_id)
+
 
 
 
