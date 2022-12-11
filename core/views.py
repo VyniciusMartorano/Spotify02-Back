@@ -31,8 +31,6 @@ usar trigger pra isso
 TODO: CRIAR API PARA DOWNLOADS
 """
 
-
-
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = s.UserSerializer
@@ -163,9 +161,6 @@ class MusicsViewSet(viewsets.ModelViewSet):
         try: music = qs_musics.get(id=music_id)
         except: return Response('Não foi possivel encontrar a música no banco de dados', status=500)
 
-        artist = qs_artists.filter(id=music.artist.id).first()
-        if artist.qtd_tracks > 0: qs_artists.filter(id=music.artist.id).update(qtd_tracks=artist.qtd_tracks - 1)
-
         try: music.delete()
         except: return Response(data=f'Não foi possivel deletar a música {music.music_name}')
         else: 
@@ -256,17 +251,18 @@ class PlaylistViewSet(viewsets.ModelViewSet):
 
         return Response(result, status=200)
 
-    def split_array_in_sub_arrays_with_five_elements(array: list) -> list:
-        result = cache = []
+    def split_array_in_sub_arrays_with_five_elements(self, array: list) -> list:
+        result = [] 
+        sublist = []
         tam_array = len(array)
 
         i = 1
         while i < tam_array + 1:
+            sublist.append(dict(array[i - 1]))
+
             if i % 5 == 0 or i == tam_array:
-                cache.append(array[i - 1])
-                result.append(cache)
-                cache = []
-            else: cache.append(array[i - 1])
+                result.append(sublist)
+                sublist = []
 
             i += 1
         return result
@@ -279,6 +275,17 @@ class PlaylistViewSet(viewsets.ModelViewSet):
 
         user_id = req['user_id'] if 'user_id' in req else None
         if user_id: qs_playlists = qs_playlists.filter(user_id=user_id)
+        
+        qs_playlists_serialized = s.PlaylistSerializer(qs_playlists, many=True).data
+        for i in qs_playlists:print(f'\n{i}\n')
+        splited_array = self.split_array_in_sub_arrays_with_five_elements(list(qs_playlists_serialized)) 
+        
+        #error: ValueError: Circular reference detected
+        print(len(qs_playlists_serialized))
+        print(len(splited_array))
+        # for i in splited_array: print(f'\n{i}\n')
+
+        return Response(splited_array, status=status.HTTP_200_OK)
 
 
 
