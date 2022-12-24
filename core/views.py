@@ -31,10 +31,13 @@ usar trigger pra isso
 TODO: CRIAR API PARA DOWNLOADS
 """
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(viewsets.ViewSet):
     queryset = User.objects.all()
     serializer_class = s.UserSerializer
 
+    def list(self, request):
+        user = s.UserSerializer(request.user).data
+        return Response(user)
     
     @action(detail=False, methods=['post'])
     def create_user(self, *args, **kwargs):
@@ -83,9 +86,6 @@ class UserViewSet(viewsets.ModelViewSet):
     def logout(self, *args, **kwargs):
         req = self.request
         print(req)
-
-
-
         return Response('Logout realizado com sucesso', status=200)
 
 
@@ -277,14 +277,8 @@ class PlaylistViewSet(viewsets.ModelViewSet):
         if user_id: qs_playlists = qs_playlists.filter(user_id=user_id)
         
         qs_playlists_serialized = s.PlaylistSerializer(qs_playlists, many=True).data
-        for i in qs_playlists:print(f'\n{i}\n')
-        splited_array = self.split_array_in_sub_arrays_with_five_elements(list(qs_playlists_serialized)) 
+        splited_array = self.split_array_in_sub_arrays_with_five_elements(qs_playlists_serialized) 
         
-        #error: ValueError: Circular reference detected
-        print(len(qs_playlists_serialized))
-        print(len(splited_array))
-        # for i in splited_array: print(f'\n{i}\n')
-
         return Response(splited_array, status=status.HTTP_200_OK)
 
 

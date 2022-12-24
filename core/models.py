@@ -17,7 +17,7 @@ def upload_file_music(instance, filename):
 
 
 class Artist(models.Model):
-    name       = models.CharField(max_length=255, null=False, blank=False)
+    name = models.CharField(max_length=255, null=False, blank=False)
 
     class Meta:
         managed = False
@@ -161,4 +161,4 @@ class PlaylistGroupItem(models.Model):
         db_table = 'PlaylistGroupItens'
 
 
-
+# class Album(models.Model)
