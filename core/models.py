@@ -12,12 +12,17 @@ def upload_image_music(instance, filename):
 def upload_thumbnail(instance, filename):
     return f'images/thumbnails/{instance}-{filename}'
 
+def upload_artist_image(instance, filename):
+    return f'images/artists/{instance}-{filename}'
+
 def upload_file_music(instance, filename):
     return f'musics/{instance}-{filename}'
 
 
+
 class Artist(models.Model):
     name = models.CharField(max_length=255, null=False, blank=False)
+    image = models.ImageField(db_column='image', upload_to=upload_artist_image, blank=True)
 
     class Meta:
         managed = False
@@ -161,4 +166,19 @@ class PlaylistGroupItem(models.Model):
         db_table = 'PlaylistGroupItens'
 
 
-# class Album(models.Model)
+class Album(models.Model):
+    title = models.CharField(max_length=40, null=False, blank=False)
+    artist_id = models.ForeignKey(Artist,db_column='artist_id', on_delete=models.CASCADE, null=False, blank=False)
+
+    class Meta:
+        managed = False
+        db_table = 'Album'
+
+
+class AlbumMusic(models.Model):
+    album_id = models.ForeignKey(Album,db_column='album_id', on_delete=models.CASCADE, null=False, blank=False)
+    music_id = models.ForeignKey(Musics,db_column='music_id', on_delete=models.CASCADE, null=False, blank=False)
+
+    class Meta:
+        managed = False
+        db_table = 'AlbumMusic'

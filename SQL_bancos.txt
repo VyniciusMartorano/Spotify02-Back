@@ -97,3 +97,32 @@ CREATE TABLE spotify02.dbo.PlaylistGroupItens (
 
 ALTER TABLE spotify02.dbo.PlaylistGroupItens ADD CONSTRAINT FK_group FOREIGN KEY (group_id) REFERENCES spotify02.dbo.PlaylistGroups(id) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE spotify02.dbo.PlaylistGroupItens ADD CONSTRAINT PlaylistGroupItens_FK FOREIGN KEY (playlist_id) REFERENCES spotify02.dbo.Playlists(id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+
+CREATE TABLE spotify02.dbo.Album (
+	id int IDENTITY(1,1) NOT NULL,
+	title varchar(20) COLLATE Latin1_General_CI_AS NOT NULL,
+	artist_id int NOT NULL,
+	CONSTRAINT PK__Albuns__3213E83F3DCC169B PRIMARY KEY (id)
+);
+
+
+-- spotify02.dbo.Album foreign keys
+
+ALTER TABLE spotify02.dbo.Album ADD CONSTRAINT Album_FK FOREIGN KEY (artist_id) REFERENCES spotify02.dbo.Artists(id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+
+CREATE TABLE spotify02.dbo.AlbumMusics (
+	id int IDENTITY(0,1) NOT NULL,
+	album_id int NOT NULL,
+	music_id int NOT NULL,
+	CONSTRAINT AlbumMusics_PK PRIMARY KEY (id)
+);
+
+
+-- spotify02.dbo.AlbumMusics foreign keys
+
+ALTER TABLE spotify02.dbo.AlbumMusics ADD CONSTRAINT AlbumMusics_FK FOREIGN KEY (music_id) REFERENCES spotify02.dbo.Musics(id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE spotify02.dbo.AlbumMusics ADD CONSTRAINT AlbumMusics_FK_album FOREIGN KEY (album_id) REFERENCES spotify02.dbo.Album(id) ON DELETE CASCADE ON UPDATE CASCADE;

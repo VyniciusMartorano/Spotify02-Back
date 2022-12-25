@@ -49,6 +49,7 @@ class MusicsLikedSerializer(serializers.ModelSerializer):
 
 
 class ArtistSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(use_url=True)
     qtd_tracks = serializers.SerializerMethodField()
 
     class Meta:
