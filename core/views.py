@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from utils.dowloadMusic import dowloadMusic
 from api.settings import MEDIA_ROOT 
-from utils.media.media_urls import DEFAULT_IMAGE_PATH
+from utils.media.media_urls import DEFAULT_IMAGE_MUSIC_PATH
 from . import  models as m
 from . import serializers as s
 
@@ -89,6 +89,15 @@ class UserViewSet(viewsets.ViewSet):
         return Response('Logout realizado com sucesso', status=200)
 
 
+class PessoaViewSet(viewsets.ModelViewSet):
+    queryset = m.Pessoa.objects.all()
+    serializer_class = s.PessoaSerializer
+
+    def list(self, request):
+        pessoa = self.queryset.get(user_id=request.user.id)
+        serializer = s.PessoaSerializer(pessoa).data
+        return Response(serializer)
+
 
 
 class ArtistViewSet(viewsets.ModelViewSet):
@@ -117,7 +126,7 @@ class MusicsViewSet(viewsets.ModelViewSet):
         if not music_url and not music_file: return Response(data='Você precisa enviar a música', status=400)
         if music_url and music_file: return Response(data='Você deve enviar apenas um dos dois formatos', status=400)
         if not image: 
-            image = DEFAULT_IMAGE_PATH
+            image = DEFAULT_IMAGE_MUSIC_PATH
     
         music = music_file or music_url
         if type(music) == str: 
@@ -165,7 +174,7 @@ class MusicsViewSet(viewsets.ModelViewSet):
         except: return Response(data=f'Não foi possivel deletar a música {music.music_name}')
         else: 
             os.remove(f'{MEDIA_ROOT}/{music.file}')
-            if music.image != DEFAULT_IMAGE_PATH:
+            if music.image != DEFAULT_IMAGE_MUSIC_PATH:
                 os.remove(f'{MEDIA_ROOT}/{music.image}')
             return Response(f'A música {music.music_name} foi deletada com sucesso', status=200)
 

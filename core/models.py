@@ -1,9 +1,12 @@
+import sys
+sys.path.append('utils')
 from django.db import models
 from PIL import Image
 from pickletools import optimize
 import os
 from django.conf import settings
 from django.contrib.auth.models import User
+from media import media_urls
 
 
 def upload_image_music(instance, filename):
@@ -18,6 +21,18 @@ def upload_artist_image(instance, filename):
 def upload_file_music(instance, filename):
     return f'musics/{instance}-{filename}'
 
+def upload_pessoa_image(instance, filename):
+    return f'images/profiles/{instance}-{filename}'
+
+
+
+class Pessoa(models.Model):
+    image = models.ImageField(null=True, blank=True, upload_to=upload_pessoa_image, default=media_urls.DEFAULT_IMAGE_PESSOA_PATH)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False)
+
+    class Meta: 
+        managed = False
+        db_table = 'Pessoa'
 
 
 class Artist(models.Model):

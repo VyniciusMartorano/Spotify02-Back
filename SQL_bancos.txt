@@ -126,3 +126,15 @@ CREATE TABLE spotify02.dbo.AlbumMusics (
 
 ALTER TABLE spotify02.dbo.AlbumMusics ADD CONSTRAINT AlbumMusics_FK FOREIGN KEY (music_id) REFERENCES spotify02.dbo.Musics(id) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE spotify02.dbo.AlbumMusics ADD CONSTRAINT AlbumMusics_FK_album FOREIGN KEY (album_id) REFERENCES spotify02.dbo.Album(id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+CREATE TABLE spotify02.dbo.Pessoa (
+	id int IDENTITY(1,1) NOT NULL,
+	[image] varchar(255) COLLATE Latin1_General_CI_AS NULL,
+	user_id int NOT NULL
+);
+
+
+-- spotify02.dbo.Pessoa foreign keys
+
+ALTER TABLE spotify02.dbo.Pessoa ADD CONSTRAINT Pessoa_FK FOREIGN KEY (user_id) REFERENCES spotify02.dbo.auth_user(id) ON DELETE CASCADE ON UPDATE CASCADE;

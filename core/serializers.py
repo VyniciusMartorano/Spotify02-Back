@@ -21,6 +21,14 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
+class PessoaSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(use_url=True)
+
+    class Meta:
+        model = m.Pessoa
+        fields = ('__all__')
+
+
 
 class MusicsSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(use_url=True)
