@@ -1,10 +1,10 @@
-import sys, os
+import sys, os, json
 sys.path.append('utils')
 from django.shortcuts import render
-import json
 from django.db import models
 from rest_framework import viewsets
-from rest_framework.decorators import action
+from rest_framework.views import APIView
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
@@ -30,6 +30,15 @@ usar trigger pra isso
 
 TODO: CRIAR API PARA DOWNLOADS
 """
+
+@api_view(['POST'])
+def search(request):
+    print(request.data)
+
+
+
+    return Response([])
+
 
 class UserViewSet(viewsets.ViewSet):
     queryset = User.objects.all()
