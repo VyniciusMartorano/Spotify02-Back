@@ -104,3 +104,9 @@ class PlaylistGroupItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = m.PlaylistGroupItem
         fields = ('__all__')
+
+
+class AlbumSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = m.Album
+        fields = ('__all__')

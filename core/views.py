@@ -26,18 +26,63 @@ E QUANDO FOR ADICIONADA UMA MUSICA JA ADICIONAR ELA NA PLAYLIST THIS
 usar trigger pra isso
 
 
-
-
 TODO: CRIAR API PARA DOWNLOADS
 """
 
+def retrieve_musics_by_filter(filter_music: str) -> list:
+    queryset = m.Musics.objects.using('default')
+    queryset = queryset.filter(Q(music_name__icontains=filter_music))
+
+    serializer = s.MusicsSerializer(queryset, many=True).data
+    return serializer
+
+def retrieve_playlists_by_filter(filter_playlist: str) -> list:
+    queryset = m.Playlist.objects.using('default')
+    queryset = queryset.filter(title__icontains=filter_playlist)
+
+    serializer = s.PlaylistSerializer(queryset, many=True).data
+    return serializer
+
+def retrieve_albuns_by_filter(filter_albuns: str) -> list:
+    queryset = m.Album.objects.using('default')
+    queryset = queryset.filter(title__icontains=filter_albuns)
+
+    serializer = s.AlbumSerializer(queryset, many=True).data
+    return serializer
+
+def retrieve_artists_by_filter(filter_artist: str) -> list:
+    queryset = m.Artist.objects.using('default')
+    queryset = queryset.filter(name__icontains=filter_artist)
+
+    serializer = s.ArtistSerializer(queryset, many=True).data
+    return serializer
+
+SEARCH_OPTIONS = {
+    'MUSIC': 1,
+    'PLAYLIST': 2,
+    'ALBUM': 3,
+    'ARTIST': 4
+}
+
+
 @api_view(['POST'])
 def search(request):
-    print(request.data)
+    req = request.data
+    result = [] 
 
+    if req['optionSearch'] == SEARCH_OPTIONS['MUSIC']:
+        result = retrieve_musics_by_filter(filter_music=req['filter'])
 
+    elif req['optionSearch'] == SEARCH_OPTIONS['PLAYLIST']:
+        result = retrieve_playlists_by_filter(filter_playlist=req['filter'])
 
-    return Response([])
+    elif req['optionSearch'] == SEARCH_OPTIONS['ALBUM']:
+        result = retrieve_albuns_by_filter(filter_album=req['filter'])
+
+    elif req['optionSearch'] == SEARCH_OPTIONS['ARTIST']:
+        result = retrieve_artists_by_filter(filter_artist=req['filter'])
+
+    return Response(result)
 
 
 class UserViewSet(viewsets.ViewSet):
