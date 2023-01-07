@@ -33,10 +33,16 @@ class PessoaSerializer(serializers.ModelSerializer):
 class MusicsSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(use_url=True)
     file = serializers.FileField(use_url=True)
+    artist_name = serializers.SerializerMethodField()
+    
 
     class Meta:
         model = m.Musics
         fields = ('__all__')
+
+
+    def get_artist_name(self, item: dict):
+        return item.artist.name
 
 
     def create(self, validated_data):

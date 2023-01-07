@@ -38,7 +38,6 @@ class Pessoa(models.Model):
 class Artist(models.Model):
     name = models.CharField(max_length=255, null=False, blank=False)
     image = models.ImageField(db_column='image', upload_to=upload_artist_image, blank=True)
-
     class Meta:
         managed = False
         db_table = 'Artists'
@@ -70,6 +69,7 @@ class Musics(models.Model):
     #TODO: trazer a info do liked no serializer puxando do musicsliked
 
     def __str__(self): return self.music_name
+    
     
     @staticmethod
     def resize_image(img, new_width=68):

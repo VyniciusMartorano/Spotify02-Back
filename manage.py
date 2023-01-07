@@ -3,9 +3,10 @@
 import os
 import sys
 from django.core.management.commands.runserver import Command as runserver
+from decouple import config
 
 
-runserver.default_port = '10000'
+runserver.default_port = config('PORT')
 
 
 def main():

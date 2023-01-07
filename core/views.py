@@ -8,6 +8,7 @@ from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from django.db.models import Q
 from rest_framework import status
 from utils.dowloadMusic import dowloadMusic
 from api.settings import MEDIA_ROOT 
