@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 
 
 
+
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
 
@@ -34,7 +35,6 @@ class MusicsSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(use_url=True)
     file = serializers.FileField(use_url=True)
     artist_name = serializers.SerializerMethodField()
-    
 
     class Meta:
         model = m.Musics

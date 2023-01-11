@@ -12,14 +12,18 @@ from media import media_urls
 def upload_image_music(instance, filename):
     return f'images/{instance}-{filename}'
 
+
 def upload_thumbnail(instance, filename):
     return f'images/thumbnails/{instance}-{filename}'
+
 
 def upload_artist_image(instance, filename):
     return f'images/artists/{instance}-{filename}'
 
+
 def upload_file_music(instance, filename):
     return f'musics/{instance}-{filename}'
+
 
 def upload_pessoa_image(instance, filename):
     return f'images/profiles/{instance}-{filename}'
@@ -46,7 +50,6 @@ class Artist(models.Model):
         return self.name
 
 
-
 class Genero(models.Model):
     descricao = models.CharField(null=False, blank=False, max_length=100)
 
@@ -63,8 +66,8 @@ class Musics(models.Model):
     music_name = models.CharField(max_length=100, null=False, blank=False)
     artist     = models.ForeignKey(Artist, on_delete=models.CASCADE)
     genero     = models.ForeignKey(Genero, on_delete=models.CASCADE)
-    image      = models.ImageField(db_column='imagem',upload_to=upload_image_music, blank=True)
-    file       = models.FileField(db_column='music',upload_to=upload_file_music, blank=True)
+    image      = models.ImageField(db_column='imagem', upload_to=upload_image_music, blank=True)
+    file       = models.FileField(db_column='music', upload_to=upload_file_music, blank=True)
     duration   = models.FloatField(null=True, blank=True)
     #TODO: trazer a info do liked no serializer puxando do musicsliked
 

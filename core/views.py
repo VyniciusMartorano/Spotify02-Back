@@ -13,6 +13,7 @@ from rest_framework import status
 from utils.dowloadMusic import dowloadMusic
 from api.settings import MEDIA_ROOT 
 from utils.media.media_urls import DEFAULT_IMAGE_MUSIC_PATH
+from mutagen.mp3 import MP3
 from . import  models as m
 from . import serializers as s
 
@@ -170,7 +171,6 @@ class GeneroViewSet(viewsets.ModelViewSet):
 class MusicsViewSet(viewsets.ModelViewSet):
     queryset = m.Musics.objects
     serializer_class = s.MusicsSerializer
- 
     
     @action(detail=False, methods=['post'])
     def insert_music(self, *args, **kwargs):
@@ -204,6 +204,7 @@ class MusicsViewSet(viewsets.ModelViewSet):
             artist_id=artist_id,
             genero_id=genero_id,
             file=music,
+            duration=MP3
             image=image
         )
         music.save()
