@@ -25,7 +25,6 @@ CREATE TABLE Musics (
 	genero_id int NOT NULL,
 	imagem varchar(255),
 	music  varchar(255) NOT NULL,		
-	duration float NULL,
 	PRIMARY KEY (id),
 
 	FOREIGN KEY (genero_id) REFERENCES generos(id),

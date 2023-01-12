@@ -19,7 +19,6 @@ from . import serializers as s
 
 
 
-
 """
 TODO:
 
@@ -174,6 +173,7 @@ class MusicsViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['post'])
     def insert_music(self, *args, **kwargs):
+        
         qs_musics = m.Musics.objects
         fields = [ 'name_music','artist_id','genero_id','image','music_url', 'music_file']
         name_music, artist_id, genero_id, image, music_url, music_file = [ self.request.data.get(item, None) for item in fields ]
@@ -204,7 +204,6 @@ class MusicsViewSet(viewsets.ModelViewSet):
             artist_id=artist_id,
             genero_id=genero_id,
             file=music,
-            duration=MP3
             image=image
         )
         music.save()

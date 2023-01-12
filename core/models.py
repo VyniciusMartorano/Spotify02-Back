@@ -68,7 +68,6 @@ class Musics(models.Model):
     genero     = models.ForeignKey(Genero, on_delete=models.CASCADE)
     image      = models.ImageField(db_column='imagem', upload_to=upload_image_music, blank=True)
     file       = models.FileField(db_column='music', upload_to=upload_file_music, blank=True)
-    duration   = models.FloatField(null=True, blank=True)
     #TODO: trazer a info do liked no serializer puxando do musicsliked
 
     def __str__(self): return self.music_name
