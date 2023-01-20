@@ -105,8 +105,8 @@ class Musics(models.Model):
 
 
 class MusicsLiked(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    music_id = models.ForeignKey(Musics, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    music = models.ForeignKey(Musics, on_delete=models.CASCADE)
 
     class Meta:
         managed = False

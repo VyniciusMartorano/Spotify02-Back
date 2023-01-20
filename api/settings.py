@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     'core.apps.CoreConfig',
     "corsheaders",
     'rest_framework',
-    'rest_framework.authtoken'
+    'rest_framework.authtoken',
 ]
 
 
@@ -154,16 +154,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 
-
-
-
-
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/4.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 

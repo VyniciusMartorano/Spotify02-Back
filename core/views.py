@@ -30,11 +30,11 @@ usar trigger pra isso
 TODO: CRIAR API PARA DOWNLOADS
 """
 
-def retrieve_musics_by_filter(filter_music: str) -> list:
+def retrieve_musics_by_filter(filter_music: str, user_id: int) -> list:
     queryset = m.Musics.objects.using('default')
     queryset = queryset.filter(Q(music_name__icontains=filter_music))
 
-    serializer = s.MusicsSerializer(queryset, many=True).data
+    serializer = s.MusicsSerializer(queryset, many=True, context={'user_id': user_id}).data
     return serializer
 
 def retrieve_playlists_by_filter(filter_playlist: str) -> list:
@@ -72,7 +72,7 @@ def search(request):
     result = [] 
 
     if req['optionSearch'] == SEARCH_OPTIONS['MUSIC']:
-        result = retrieve_musics_by_filter(filter_music=req['filter'])
+        result = retrieve_musics_by_filter(filter_music=req['filter'], user_id=request.user.id)
 
     elif req['optionSearch'] == SEARCH_OPTIONS['PLAYLIST']:
         result = retrieve_playlists_by_filter(filter_playlist=req['filter'])
@@ -83,7 +83,7 @@ def search(request):
     elif req['optionSearch'] == SEARCH_OPTIONS['ARTIST']:
         result = retrieve_artists_by_filter(filter_artist=req['filter'])
 
-    return Response(result)
+    return Response(result) 
 
 
 class UserViewSet(viewsets.ViewSet):
@@ -93,6 +93,7 @@ class UserViewSet(viewsets.ViewSet):
     def list(self, request):
         user = s.UserSerializer(request.user).data
         return Response(user)
+
     
     @action(detail=False, methods=['post'])
     def create_user(self, *args, **kwargs):
@@ -140,7 +141,6 @@ class UserViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['post'])
     def logout(self, *args, **kwargs):
         req = self.request
-        print(req)
         return Response('Logout realizado com sucesso', status=200)
 
 
