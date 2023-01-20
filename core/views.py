@@ -268,6 +268,25 @@ class MusicsLikedViewSet(viewsets.ModelViewSet):
     serializer_class = s.MusicsLikedSerializer
 
 
+    @action(detail=False, methods=['post'])
+    def set_music_is_liked(self, *args, **kwargs):
+        queryset = m.MusicsLiked.objects.using('default').filter(
+            user_id=self.request.user.id, 
+            music_id=self.request.data['music_id']
+        )
+
+        if queryset.count() == 1: 
+            queryset.delete()
+        else:
+            m.MusicsLiked.objects.create(
+                music=self.request.data['music_id'], 
+                user=self.request.user.id
+            )
+
+        return Response(data='OK', status=200)
+        
+
+
 
 class PlaylistViewSet(viewsets.ModelViewSet):
     queryset = m.Playlist.objects.all()
