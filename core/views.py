@@ -275,12 +275,14 @@ class MusicsLikedViewSet(viewsets.ModelViewSet):
             music_id=self.request.data['music_id']
         )
 
+        print(f'\n{queryset.count()}\n')
+
         if queryset.count() == 1: 
             queryset.delete()
         else:
             m.MusicsLiked.objects.create(
-                music=self.request.data['music_id'], 
-                user=self.request.user.id
+                music_id=self.request.data['music_id'], 
+                user_id=self.request.user.id
             )
 
         return Response(data='OK', status=200)

@@ -7,10 +7,12 @@ from django.contrib.auth.models import User
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
+    image = serializers.SerializerMethodField()
+
 
     class Meta:
         model = User
-        fields = ('id','username', 'password')
+        fields = ('id','username', 'password', 'image')
 
 
     def create(self, validated_data):
@@ -20,6 +22,11 @@ class UserSerializer(serializers.ModelSerializer):
         user.save()
         
         return user
+
+    def get_image(self, user: m.User):
+        pessoa = m.Pessoa.objects.using('default').get(user_id=user.id)
+        return  'media/' + str(pessoa.image)
+
 
 
 class PessoaSerializer(serializers.ModelSerializer):
