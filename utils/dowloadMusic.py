@@ -9,7 +9,7 @@ def dowloadMusic(urlMusic: str, output_path: str, filename: str) -> str:
     yt = YouTube(url=urlMusic)
 
     video = yt.streams.filter(only_audio=True).first()
-    out_file = video.download(output_path=output_path,filename=filename)
+    out_file = video.download(output_path=output_path, filename=filename)
     base, extension = os.path.splitext(out_file)
     
     new_file_path = base + '.mp3'

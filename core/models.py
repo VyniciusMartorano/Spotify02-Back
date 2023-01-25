@@ -7,6 +7,7 @@ import os
 from django.conf import settings
 from django.contrib.auth.models import User
 from media import media_urls
+from resize_image import resize_image
 
 
 def upload_image_music(instance, filename):
@@ -34,9 +35,20 @@ class Pessoa(models.Model):
     image = models.ImageField(null=True, blank=True, upload_to=upload_pessoa_image, default=media_urls.DEFAULT_IMAGE_PESSOA_PATH)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False)
 
+
+    def save(self,*args,**kwargs):
+        super().save(*args,**kwargs)
+        max_image_size = 35
+        if self.image: 
+            resize_image(self.image.path, max_image_size, max_image_size)
+       
+
     class Meta: 
         managed = False
         db_table = 'Pessoa'
+    
+
+    
 
 
 class Artist(models.Model):
@@ -73,29 +85,10 @@ class Musics(models.Model):
     def __str__(self): return self.music_name
     
     
-    @staticmethod
-    def resize_image(img, new_width=68):
-        img_full_path = os.path.join(settings.MEDIA_ROOT, img.name)
-        img_pil = Image.open(img_full_path)
-        original_width, original_height = img_pil.size
-
-        if original_width <= new_width:
-            img_pil.close()
-            return
-        
-        new_height_rounded = round((new_width * original_height) / original_width)
-        new_img = img_pil.resize((new_width, new_height_rounded), Image.LANCZOS)
-        new_img.save(
-            img_full_path,
-            optimize=True,
-            quality=80
-        )
-    
-    
     def save(self,*args,**kwargs):
         super().save(*args,**kwargs)
         max_image_size = 68
-        if self.image: self.resize_image(self.image, max_image_size)
+        if self.image: resize_image(self.image.name, max_image_size, max_image_size)
        
 
 
@@ -127,28 +120,12 @@ class Playlist(models.Model):
     
     def __str__(self): return self.title
 
-
-    @staticmethod
-    def resize_image(img, new_width=195, new_heigth=195):
-        img_full_path = os.path.join(settings.MEDIA_ROOT, img.name)
-        img_pil = Image.open(img_full_path)
-        original_width, original_height = img_pil.size
-
-        if original_width <= new_width:
-            img_pil.close()
-            return
-        
-        new_img = img_pil.resize((new_width, new_heigth), Image.LANCZOS)
-        new_img.save(
-            img_full_path,
-            optimize=True,
-            quality=90
-        )
-    
     
     def save(self,*args,**kwargs):
         super().save(*args,**kwargs)
-        if self.thumbnail: self.resize_image(self.thumbnail)
+        max_image_size = 195
+        if self.thumbnail: 
+            self.resize_image(self.thumbnail.name, max_image_size, max_image_size)
 
 
 

@@ -31,7 +31,7 @@ TODO: CRIAR API PARA DOWNLOADS
 """
 
 def retrieve_musics_by_filter(filter_music: str, user_id: int) -> list:
-    queryset = m.Musics.objects.using('default')
+    queryset = m.Musics.objects.using('default').order_by('music_name')
     queryset = queryset.filter(Q(music_name__icontains=filter_music))
 
     serializer = s.MusicsSerializer(queryset, many=True, context={'user_id': user_id}).data
@@ -207,7 +207,7 @@ class MusicsViewSet(viewsets.ModelViewSet):
             image=image
         )
         music.save()
-        return Response(s.MusicsSerializer(music).data)
+        return Response(s.MusicsSerializer(music, context={'user_id': self.request.user.id}).data)
         
         
     @action(methods=['delete'], detail=False)
@@ -234,18 +234,6 @@ class MusicsViewSet(viewsets.ModelViewSet):
             return Response(f'A música {music.music_name} foi deletada com sucesso', status=200)
 
         
-    @action(methods=['post'], detail=False)
-    def search(self, *args, **kwargs):
-        request = self.request.data
-        queryset = m.Musics.objects.all()
-
-        data_filter = request['data_filter'] if 'data_filter' in request else None
-
-        if data_filter:
-            queryset = queryset.filter(music_name__icontains=data_filter) |\
-            queryset.filter(artist__name__icontains=data_filter)
-
-        return Response(s.MusicsSerializer(queryset, many=True).data) 
 
 
     @action(methods=['post'], detail=False)
@@ -259,7 +247,7 @@ class MusicsViewSet(viewsets.ModelViewSet):
         if artist_name: queryset = queryset.filter(artist__name__icontains=artist_name) 
         if music_name: queryset = queryset.filter(music_name__icontains=music_name)
 
-        return Response(s.MusicsSerializer(queryset, many=True).data, status=200)
+        return Response(s.MusicsSerializer(queryset, many=True, context={'user_id': self.request.user.id}).data, status=200)
 
 
 
