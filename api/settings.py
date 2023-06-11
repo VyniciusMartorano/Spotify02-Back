@@ -124,12 +124,12 @@ if DEBUG:
 
 DATABASES = {
      'default': {
-        'ENGINE': 'mssql',
-        'NAME': config('NAME'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'Spotify02',
+        'USER': config('USER'),
+        'PASSWORD': config('PASSWORD'),
         'HOST': config('HOST'),
-        'OPTIONS': {
-            'driver':'ODBC Driver 17 for SQL Server'
-        }
+        'PORT': config('PORT_BD'),
     }
 }
 

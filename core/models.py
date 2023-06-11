@@ -1,9 +1,6 @@
 import sys
 sys.path.append('utils')
 from django.db import models
-from PIL import Image
-from pickletools import optimize
-import os
 from django.conf import settings
 from django.contrib.auth.models import User
 from media import media_urls
