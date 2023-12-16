@@ -185,16 +185,18 @@ class MusicsViewSet(viewsets.ModelViewSet):
     
         music = music_file or music_url
         if type(music) == str: 
-            try: 
-                dowloadMusic(
-                    urlMusic=music, 
-                    output_path=f'{MEDIA_ROOT}/musics/',
-                    filename=name_music,
-                )
-                music = f'musics/{name_music}.mp3'
+            # try: 
+            dowloadMusic(
+                urlMusic=music, 
+                output_path=f'{MEDIA_ROOT}/musics/',
+                filename=name_music,
+            )
+            music = f'musics/{name_music}.mp3'
 
-            except FileExistsError: return Response(f'A música {name_music} já existe no banco de dados', status=400)
-            except Exception as e: return Response(f'Não foi possivel salvar a música')
+            # except FileExistsError: return Response(f'A música {name_music} já existe no banco de dados', status=400)
+            # except Exception as e: 
+            #     print(e)
+            #     return Response(f'Não foi possivel salvar a música', status=400)
         else:
             if (qs_musics.filter(music_name=name_music).count() > 0):
                 return Response(data=f'A música {name_music} já existe no banco de dados', status=400)

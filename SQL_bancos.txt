@@ -1,139 +1,131 @@
-
-
-
-CREATE TABLE spotify02.dbo.Artists (
-	id int IDENTITY(1,1) NOT NULL,
-	name varchar(100) COLLATE Latin1_General_CI_AS NOT NULL,
-	CONSTRAINT PK__Artists__3213E83F4DC9839B PRIMARY KEY (id)
-)
-
-
-
-CREATE TABLE Generos (
-	id int NOT NULL IDENTITY,
-	descricao varchar(100) NOT NULL,
-	PRIMARY KEY (id)
-)
-
-
-
-
-CREATE TABLE Musics (
-	id int NOT NULL IDENTITY,
-	music_name varchar(100) NOT NULL,
-	artist_id int NOT NULL,
-	genero_id int NOT NULL,
-	imagem varchar(255),
-	music  varchar(255) NOT NULL,		
-	PRIMARY KEY (id),
-
-	FOREIGN KEY (genero_id) REFERENCES generos(id),
-	FOREIGN KEY (artist_id) REFERENCES Artists(id)
-)
-
-
-
-
-CREATE TABLE MusicsLiked (
-	id INT IDENTITY NOT NULL,
-	user_id  INT NOT NULL,
-	music_id  INT NOT NULL,
-	
-	PRIMARY KEY(id),
-	FOREIGN KEY (user_id) REFERENCES auth_user(id),
-	FOREIGN KEY (music_id) REFERENCES Musics(id)
-)
-
-
-
-CREATE TABLE spotify02.dbo.Playlists (
-	id int IDENTITY NOT NULL,
-	title varchar(20) NOT NULL,
-	user_id int NULL,
-	thumbnail varchar(255) NULL,
-	descricao varchar(45)  NOT NULL,
-	is_default int NOT NULL,
-	PRIMARY KEY (id),
-
-	FOREIGN KEY (user_id) REFERENCES auth_user(id)
+CREATE TABLE "Pessoa" (
+    id serial PRIMARY KEY,
+    image VARCHAR(255),
+    user_id integer NOT NULL
 );
 
---playlists ** musics
-
-
-CREATE TABLE PlaylistMusic (
-	id int NOT NULL IDENTITY,
-	music_id int NOT NULL,
-	playlist_id int NOT NULL,
-	PRIMARY KEY (id),
-  
-	FOREIGN KEY (music_id) REFERENCES Musics(id),
-	FOREIGN KEY (playlist_id) REFERENCES Playlists(id)
-
-)
-
---groups
-
-CREATE TABLE spotify02.dbo.PlaylistGroups (
-	id int IDENTITY(0,1) NOT NULL,
-	descricao varchar(20) COLLATE Latin1_General_CI_AS NOT NULL,
-	[default] bit NOT NULL,
-	CONSTRAINT NewTable_PK PRIMARY KEY (id)
+CREATE TABLE "Artists" (
+    id serial PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    image VARCHAR(255)
 );
 
-
---groupsItens
-
-CREATE TABLE spotify02.dbo.PlaylistGroupItens (
-	id int IDENTITY(0,1) NOT NULL,
-	playlist_id int NOT NULL,
-	group_id int NOT NULL,
-	CONSTRAINT PlaylistGroupItens_PK PRIMARY KEY (id)
+CREATE TABLE "Generos" (
+    id serial PRIMARY KEY,
+    descricao VARCHAR(100) NOT NULL
 );
 
-
--- spotify02.dbo.PlaylistGroupItens foreign keys
-
-ALTER TABLE spotify02.dbo.PlaylistGroupItens ADD CONSTRAINT FK_group FOREIGN KEY (group_id) REFERENCES spotify02.dbo.PlaylistGroups(id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE spotify02.dbo.PlaylistGroupItens ADD CONSTRAINT PlaylistGroupItens_FK FOREIGN KEY (playlist_id) REFERENCES spotify02.dbo.Playlists(id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-
-
-CREATE TABLE spotify02.dbo.Album (
-	id int IDENTITY(1,1) NOT NULL,
-	title varchar(20) COLLATE Latin1_General_CI_AS NOT NULL,
-	artist_id int NOT NULL,
-	CONSTRAINT PK__Albuns__3213E83F3DCC169B PRIMARY KEY (id)
+CREATE TABLE "Musics" (
+    id serial PRIMARY KEY,
+    music_name VARCHAR(100) NOT NULL,
+    artist_id integer NOT NULL,
+    genero_id integer NOT NULL,
+    image VARCHAR(255),
+    file VARCHAR(255)
 );
 
-
--- spotify02.dbo.Album foreign keys
-
-ALTER TABLE spotify02.dbo.Album ADD CONSTRAINT Album_FK FOREIGN KEY (artist_id) REFERENCES spotify02.dbo.Artists(id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-
-
-CREATE TABLE spotify02.dbo.AlbumMusics (
-	id int IDENTITY(0,1) NOT NULL,
-	album_id int NOT NULL,
-	music_id int NOT NULL,
-	CONSTRAINT AlbumMusics_PK PRIMARY KEY (id)
+CREATE TABLE "MusicsLiked" (
+    id serial PRIMARY KEY,
+    user_id integer NOT NULL,
+    music_id integer NOT NULL
 );
 
-
--- spotify02.dbo.AlbumMusics foreign keys
-
-ALTER TABLE spotify02.dbo.AlbumMusics ADD CONSTRAINT AlbumMusics_FK FOREIGN KEY (music_id) REFERENCES spotify02.dbo.Musics(id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE spotify02.dbo.AlbumMusics ADD CONSTRAINT AlbumMusics_FK_album FOREIGN KEY (album_id) REFERENCES spotify02.dbo.Album(id) ON DELETE CASCADE ON UPDATE CASCADE;
-
-
-CREATE TABLE spotify02.dbo.Pessoa (
-	id int IDENTITY(1,1) NOT NULL,
-	[image] varchar(255) COLLATE Latin1_General_CI_AS NULL,
-	user_id int NOT NULL
+CREATE TABLE "Playlists" (
+    id serial PRIMARY KEY,
+    title VARCHAR(20) NOT NULL,
+    descricao VARCHAR(45) NOT NULL,
+    user_id integer NOT NULL,
+    thumbnail VARCHAR(255),
+    is_default integer NOT NULL
 );
 
+CREATE TABLE "PlaylistMusic" (
+    id serial PRIMARY KEY,
+    music_id integer NOT NULL,
+    playlist_id integer NOT NULL
+);
 
--- spotify02.dbo.Pessoa foreign keys
+CREATE TABLE "PlaylistGroups" (
+    id serial PRIMARY KEY,
+    descricao VARCHAR(20) NOT NULL,
+    "default" integer NOT NULL
+);
 
-ALTER TABLE spotify02.dbo.Pessoa ADD CONSTRAINT Pessoa_FK FOREIGN KEY (user_id) REFERENCES spotify02.dbo.auth_user(id) ON DELETE CASCADE ON UPDATE CASCADE;
+CREATE TABLE "PlaylistGroupItens" (
+    id serial PRIMARY KEY,
+    playlist_id integer NOT NULL,
+    group_id integer NOT NULL
+);
+
+CREATE TABLE "Album" (
+    id serial PRIMARY KEY,
+    title VARCHAR(40) NOT NULL,
+    artist_id integer NOT NULL
+);
+
+CREATE TABLE "AlbumMusic" (
+    id serial PRIMARY KEY,
+    album_id integer NOT NULL,
+    music_id integer NOT NULL
+);
+-- Tabela Musics
+ALTER TABLE "Musics"
+ADD CONSTRAINT fk_musics_genero
+FOREIGN KEY (genero_id)
+REFERENCES "Generos" (id);
+
+-- Tabela MusicsLiked
+ALTER TABLE "MusicsLiked"
+ADD CONSTRAINT fk_musicsliked_user
+FOREIGN KEY (user_id)
+REFERENCES "auth_user" (id);
+
+ALTER TABLE "MusicsLiked"
+ADD CONSTRAINT fk_musicsliked_music
+FOREIGN KEY (music_id)
+REFERENCES "Musics" (id);
+
+-- Tabela Playlists
+ALTER TABLE "Playlists"
+ADD CONSTRAINT fk_playlists_user
+FOREIGN KEY (user_id)
+REFERENCES "auth_user" (id);
+
+-- Tabela PlaylistMusic
+ALTER TABLE "PlaylistMusic"
+ADD CONSTRAINT fk_playlistmusic_music
+FOREIGN KEY (music_id)
+REFERENCES "Musics" (id);
+
+ALTER TABLE "PlaylistMusic"
+ADD CONSTRAINT fk_playlistmusic_playlist
+FOREIGN KEY (playlist_id)
+REFERENCES "Playlists" (id);
+
+-- Tabela Album
+ALTER TABLE "Album"
+ADD CONSTRAINT fk_album_artist
+FOREIGN KEY (artist_id)
+REFERENCES "Artists" (id);
+
+-- Tabela AlbumMusic
+ALTER TABLE "AlbumMusic"
+ADD CONSTRAINT fk_albummusic_album
+FOREIGN KEY (album_id)
+REFERENCES "Album" (id);
+
+ALTER TABLE "AlbumMusic"
+ADD CONSTRAINT fk_albummusic_music
+FOREIGN KEY (music_id)
+REFERENCES "Musics" (id);
+
+-- Tabela PlaylistGroupItens
+ALTER TABLE "PlaylistGroupItens"
+ADD CONSTRAINT fk_playlistgroupitens_playlist
+FOREIGN KEY (playlist_id)
+REFERENCES "Playlists" (id);
+
+ALTER TABLE "PlaylistGroupItens"
+ADD CONSTRAINT fk_playlistgroupitens_group
+FOREIGN KEY (group_id)
+REFERENCES "PlaylistGroups" (id);

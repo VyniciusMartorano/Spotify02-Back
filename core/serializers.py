@@ -86,6 +86,7 @@ class ArtistSerializer(serializers.ModelSerializer):
         fields = ('__all__')
     
     def get_qtd_tracks(self, artist):
+        print('\naa\n\n')
         qs_musics = m.Musics.objects.using('default').filter(artist=artist.id)
         return len(qs_musics)
 

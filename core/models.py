@@ -50,7 +50,8 @@ class Pessoa(models.Model):
 
 class Artist(models.Model):
     name = models.CharField(max_length=255, null=False, blank=False)
-    image = models.ImageField(db_column='image', upload_to=upload_artist_image, blank=True)
+    image = models.ImageField(
+        db_column='image', upload_to=upload_artist_image, blank=True)
     class Meta:
         managed = False
         db_table = 'Artists'
@@ -75,8 +76,8 @@ class Musics(models.Model):
     music_name = models.CharField(max_length=100, null=False, blank=False)
     artist     = models.ForeignKey(Artist, on_delete=models.CASCADE)
     genero     = models.ForeignKey(Genero, on_delete=models.CASCADE)
-    image      = models.ImageField(db_column='imagem', upload_to=upload_image_music, blank=True)
-    file       = models.FileField(db_column='music', upload_to=upload_file_music, blank=True)
+    image      = models.ImageField(db_column='image', upload_to=upload_image_music, blank=True)
+    file       = models.FileField(db_column='file', upload_to=upload_file_music, blank=True)
     #TODO: trazer a info do liked no serializer puxando do musicsliked
 
     def __str__(self): return self.music_name
@@ -122,7 +123,7 @@ class Playlist(models.Model):
         super().save(*args,**kwargs)
         max_image_size = 195
         if self.thumbnail: 
-            self.resize_image(self.thumbnail.name, max_image_size, max_image_size)
+            resize_image(self.thumbnail.name, max_image_size, max_image_size)
 
 
 
