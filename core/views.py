@@ -32,7 +32,10 @@ TODO: CRIAR API PARA DOWNLOADS
 
 def retrieve_musics_by_filter(filter_music: str, user_id: int) -> list:
     queryset = m.Musics.objects.using('default').order_by('music_name')
-    queryset = queryset.filter(Q(music_name__icontains=filter_music))
+    queryset = queryset.filter(
+        Q(music_name__startswith=filter_music) |
+        Q(music_name__icontains=filter_music)
+    )
 
     serializer = s.MusicsSerializer(queryset, many=True, context={'user_id': user_id}).data
     return serializer
@@ -70,18 +73,19 @@ SEARCH_OPTIONS = {
 def search(request):
     req = request.data
     result = [] 
+    filtro = req['filter'].strip()
 
     if req['optionSearch'] == SEARCH_OPTIONS['MUSIC']:
-        result = retrieve_musics_by_filter(filter_music=req['filter'], user_id=request.user.id)
+        result = retrieve_musics_by_filter(filter_music=filtro, user_id=request.user.id)
 
     elif req['optionSearch'] == SEARCH_OPTIONS['PLAYLIST']:
-        result = retrieve_playlists_by_filter(filter_playlist=req['filter'])
+        result = retrieve_playlists_by_filter(filter_playlist=filtro)
 
     elif req['optionSearch'] == SEARCH_OPTIONS['ALBUM']:
-        result = retrieve_albuns_by_filter(filter_album=req['filter'])
+        result = retrieve_albuns_by_filter(filter_album=filtro)
 
     elif req['optionSearch'] == SEARCH_OPTIONS['ARTIST']:
-        result = retrieve_artists_by_filter(filter_artist=req['filter'])
+        result = retrieve_artists_by_filter(filter_artist=filtro)
 
     return Response(result) 
 
