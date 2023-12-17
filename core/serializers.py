@@ -24,7 +24,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
     def get_image(self, user: m.User):
-        pessoa = m.Pessoa.objects.using('default').get(user_id=user.id)
+        pessoa = m.Pessoa.objects.using('default').get(user_id=user.pk)
         return  'media/' + str(pessoa.image)
 
 
