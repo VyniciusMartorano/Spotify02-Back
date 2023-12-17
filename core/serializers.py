@@ -42,6 +42,7 @@ class MusicsSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(use_url=True)
     file = serializers.FileField(use_url=True)
     artist_name = serializers.SerializerMethodField()
+    album_name = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
 
     class Meta:
@@ -51,6 +52,13 @@ class MusicsSerializer(serializers.ModelSerializer):
 
     def get_artist_name(self, item: dict):
         return item.artist.name
+
+    def get_album_name(self, music: m.Musics) -> bool:
+        album = m.AlbumMusic.objects.get(music_id=music.pk)
+        if not album:
+            return ''
+        
+        return m.Album.objects.get(pk=album.album_id.pk).title
 
     def get_is_liked(self, music: dict) -> bool:
         user_id = self.context['user_id']
